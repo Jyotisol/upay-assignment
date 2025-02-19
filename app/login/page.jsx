@@ -1,3 +1,8 @@
+
+
+
+
+
 "use client";
 import { useState } from "react";
 import Link from "next/link";
@@ -10,6 +15,7 @@ const defaultData = { username: "", password: "" };
 const Login = () => {
     const [data, setData] = useState(defaultData);
     const [loading, setLoading] = useState(false);
+
     const router = useRouter();
 
     const onValueChange = (e) => {
@@ -20,56 +26,45 @@ const Login = () => {
         e.preventDefault();
 
         if (!data.username || !data.password) {
-            toast.info("Please fill all mandatory fields");
+            toast.info("Please fill all mandatory parameters");
             return;
         }
 
-        setLoading(true);
+        setLoading(true); 
 
         try {
-            const response = await fetch("/api/users/login", {
-                method: "POST",
+            const response = await fetch('/api/users/login', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(data),
             });
-
-            const text = await response.text(); // Read raw response
-            let responseData;
-            try {
-                responseData = JSON.parse(text); // Try to parse JSON
-            } catch (error) {
-                console.error("Invalid JSON response:", text);
-                toast.error("Server error. Please try again.");
-                return;
-            }
-
-            if (response.ok && responseData.user) {
+            const responseData = await response.json();
+            if (response.ok) {
                 setData(defaultData);
                 localStorage.setItem("user", JSON.stringify(responseData.user));
-                router.push("/dashboard");
+                router.push('/dashboard');
             } else {
-                toast.error(responseData.message || "Invalid credentials");
+                toast.error("Invalid credentials");
             }
         } catch (error) {
             toast.error("An error occurred. Please try again later.");
-            console.error("Fetch error:", error);
+            console.error(error);
         } finally {
-            setLoading(false);
+            setLoading(false); 
         }
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
+        <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center ">
             <div className="bg-white shadow-xl px-16 pt-8 pb-12 mb-4 rounded-2xl">
                 <h1 className="text-3xl mb-4 text-center">Login</h1>
-                <form className="space-y-4" onSubmit={onLogin}>
+                <form className="space-y-4">
                     <Input
                         label="Username"
                         id="username"
                         type="text"
-                        name="username"
                         value={data.username}
                         onChange={onValueChange}
                     />
@@ -77,16 +72,15 @@ const Login = () => {
                         label="Password"
                         id="password"
                         type="password"
-                        name="password"
                         value={data.password}
                         onChange={onValueChange}
                     />
                     <button
-                        type="submit"
                         className={`${
                             loading ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-700"
                         } text-white font-bold py-2 px-4 rounded-full w-full`}
-                        disabled={loading}
+                        onClick={onLogin}
+                        disabled={loading} 
                     >
                         {loading ? "Signing In..." : "Sign In"}
                     </button>
@@ -103,105 +97,6 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
-
-
-// "use client";
-// import { useState } from "react";
-// import Link from "next/link";
-// import { useRouter } from "next/navigation";
-// import Input from "@/components/Input";
-// import { toast } from "react-toastify";
-
-// const defaultData = { username: "", password: "" };
-
-// const Login = () => {
-//     const [data, setData] = useState(defaultData);
-//     const [loading, setLoading] = useState(false);
-
-//     const router = useRouter();
-
-//     const onValueChange = (e) => {
-//         setData({ ...data, [e.target.name]: e.target.value });
-//     };
-
-//     const onLogin = async (e) => {
-//         e.preventDefault();
-
-//         if (!data.username || !data.password) {
-//             toast.info("Please fill all mandatory parameters");
-//             return;
-//         }
-
-//         setLoading(true); 
-
-//         try {
-//             const response = await fetch('/api/users/login', {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                 },
-//                 body: JSON.stringify(data),
-//             });
-//             const responseData = await response.json();
-//             if (response.ok) {
-//                 setData(defaultData);
-//                 localStorage.setItem("user", JSON.stringify(responseData.user));
-//                 router.push('/dashboard');
-//             } else {
-//                 toast.error("Invalid credentials");
-//             }
-//         } catch (error) {
-//             toast.error("An error occurred. Please try again later.");
-//             console.error(error);
-//         } finally {
-//             setLoading(false); 
-//         }
-//     };
-
-//     return (
-//         <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center ">
-//             <div className="bg-white shadow-xl px-16 pt-8 pb-12 mb-4 rounded-2xl">
-//                 <h1 className="text-3xl mb-4 text-center">Login</h1>
-//                 <form className="space-y-4">
-//                     <Input
-//                         label="Username"
-//                         id="username"
-//                         type="text"
-//                         value={data.username}
-//                         onChange={onValueChange}
-//                     />
-//                     <Input
-//                         label="Password"
-//                         id="password"
-//                         type="password"
-//                         value={data.password}
-//                         onChange={onValueChange}
-//                     />
-//                     <button
-//                         className={`${
-//                             loading ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-700"
-//                         } text-white font-bold py-2 px-4 rounded-full w-full`}
-//                         onClick={onLogin}
-//                         disabled={loading} 
-//                     >
-//                         {loading ? "Signing In..." : "Sign In"}
-//                     </button>
-//                 </form>
-//                 <p className="text-center mt-4">
-//                     Don't have an account?{" "}
-//                     <Link href="/register" className="text-blue-500 hover:underline">
-//                         Register
-//                     </Link>
-//                 </p>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Login;
 
 
 

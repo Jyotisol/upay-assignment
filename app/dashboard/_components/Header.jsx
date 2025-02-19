@@ -22,14 +22,27 @@ const Header = () => {
   };
 
 
-
-
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // Update state with user details
+        try {
+
+            setUser(JSON.parse(storedUser)); // Update state with user details
+        } catch (error) {
+            console.error("Error parsing user data:", error);
+            localStorage.removeItem("user"); // Remove corrupted data
+        }
     }
-  }, []);
+}, []);
+
+
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem("user");
+  //   if (storedUser) {
+  //     setUser(JSON.parse(storedUser)); // Update state with user details
+  //   }
+  // }, []);
+
     return (
       <div className="border-b-2 border-[#DBDBDB] w-full">
       <header className="flex justify-between items-center bg-white my-[7px] mx-5">
